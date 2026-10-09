@@ -15,14 +15,8 @@
 
     <style>
         :root {
-            --ink: #121a2b;
-            --panel: #1a2338;
-            --line: #2b3652;
-            --user: #243049;
-            --text: #e8e6df;
-            --muted: #98a2b8;
-            --amber: #e3a857;
-            --danger: #f0897b;
+            --ink: #121a2b; --panel: #1a2338; --line: #2b3652; --user: #243049;
+            --text: #e8e6df; --muted: #98a2b8; --amber: #e3a857; --danger: #f0897b; --ok: #5fb88a;
             --sans: "IBM Plex Sans", system-ui, sans-serif;
             --serif: "Source Serif 4", Georgia, serif;
             --mono: "JetBrains Mono", Consolas, monospace;
@@ -30,124 +24,93 @@
         * { box-sizing: border-box; }
         html, body { height: 100%; }
         body {
-            margin: 0;
-            background: var(--ink);
-            color: var(--text);
-            font-family: var(--sans);
-            padding-top: env(safe-area-inset-top, 0px);
-            padding-bottom: env(safe-area-inset-bottom, 0px);
+            margin: 0; background: var(--ink); color: var(--text); font-family: var(--sans);
+            padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
         }
         :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-
         .app { height: 100%; display: flex; flex-direction: column; }
 
-        header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 22px;
-            border-bottom: 1px solid var(--line);
-        }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--line); }
         header h1 { margin: 0; font-size: 16px; font-weight: 600; }
         .model { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: #5fb88a; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
         .dot.busy { background: var(--amber); animation: pulse 1s ease-in-out infinite; }
         @keyframes pulse { 50% { opacity: .3; } }
 
         #messages { flex: 1; overflow-y: auto; padding: 28px 18px 12px; }
-        #thread { max-width: 760px; margin: 0 auto; }
+        #thread { max-width: 780px; margin: 0 auto; }
 
         .empty { padding: 8vh 0 0; }
         .empty h2 { font: 600 28px/1.25 var(--serif); margin: 0 0 8px; }
         .empty p { color: var(--muted); margin: 0 0 22px; }
         .chips { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-        .chip {
-            font: inherit; font-size: 14px; text-align: left;
-            color: var(--text); background: var(--panel);
-            border: 1px solid var(--line); border-radius: 10px;
-            padding: 10px 14px; cursor: pointer;
-        }
+        .chip { font: inherit; font-size: 14px; text-align: left; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; }
         .chip:hover { border-color: var(--amber); }
 
         .turn { margin-bottom: 30px; }
-        .user {
-            margin-left: auto; width: fit-content; max-width: 85%;
-            background: var(--user); padding: 10px 15px;
-            border-radius: 14px 14px 4px 14px;
-            white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55;
-        }
+        .user { margin-left: auto; width: fit-content; max-width: 85%; background: var(--user); padding: 10px 15px; border-radius: 14px 14px 4px 14px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
 
-        .answer {
-            font-family: var(--serif); font-size: 17px; line-height: 1.75;
-            overflow-wrap: anywhere;
-        }
-        .answer > :first-child { margin-top: 0; }
+        /* ---------- Answer text ---------- */
+        .answer { font-family: var(--serif); font-size: 17px; line-height: 1.75; overflow-wrap: anywhere; }
+        .blk { display: contents; }
+        .answer > .blk:first-child > :first-child { margin-top: 0; }
         .answer p { margin: 0 0 16px; }
-        .answer h1, .answer h2, .answer h3 {
-            font-family: var(--sans); line-height: 1.35; margin: 28px 0 10px;
-        }
+        .answer h1, .answer h2, .answer h3 { font-family: var(--sans); line-height: 1.35; margin: 28px 0 10px; }
         .answer h1 { font-size: 22px; } .answer h2 { font-size: 19px; } .answer h3 { font-size: 16px; }
         .answer ul, .answer ol { padding-left: 24px; margin: 0 0 16px; }
         .answer li { margin: 6px 0; }
+        .answer li > .code-card { margin-top: 10px; }
         .answer a { color: var(--amber); }
-        .answer blockquote {
-            margin: 0 0 16px; padding-left: 14px;
-            border-left: 3px solid var(--amber); color: var(--muted);
-        }
-        .answer :not(pre) > code {
-            font-family: var(--mono); font-size: .85em;
-            background: var(--panel); padding: 2px 6px; border-radius: 4px;
-        }
+        .answer hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+        .answer blockquote { margin: 0 0 16px; padding-left: 14px; border-left: 3px solid var(--amber); color: var(--muted); }
+        .answer :not(pre) > code { font-family: var(--mono); font-size: .85em; background: var(--panel); padding: 2px 6px; border-radius: 4px; }
         .answer table { display: block; overflow-x: auto; border-collapse: collapse; margin-bottom: 16px; font-family: var(--sans); font-size: 14px; }
         .answer th, .answer td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; }
         .answer th { background: var(--panel); }
+        .answer.streaming::after { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); animation: pulse 1s ease-in-out infinite; }
+        .answer .fail { color: var(--danger); font-family: var(--sans); font-size: 15px; margin-top: 12px; }
 
-        .code-block { margin: 0 0 18px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-        .code-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 6px 12px; background: var(--panel);
-            font: 12px var(--sans); color: var(--muted);
-        }
-        .copy {
-            font: inherit; color: var(--text); background: none;
-            border: 1px solid var(--line); border-radius: 6px;
-            padding: 3px 10px; cursor: pointer;
-        }
-        .copy:hover { border-color: var(--amber); }
-        .code-block pre { margin: 0; padding: 14px 16px; overflow-x: auto; background: #0d1424; }
-        .code-block pre code { font-family: var(--mono); font-size: 13px; line-height: 1.6; background: none; padding: 0; }
-        .answer > pre { padding: 14px 16px; overflow-x: auto; background: #0d1424; border-radius: 10px; }
+        /* ---------- Code card ---------- */
+        .code-card { margin: 0 0 18px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #0d1424; font-family: var(--sans); line-height: 1.5; }
+        .code-head { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 8px 7px 14px; background: var(--panel); font-size: 12px; color: var(--muted); }
+        .lang { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex: none; }
+        .code-card.live .status-dot { background: var(--amber); animation: pulse 1s ease-in-out infinite; }
+        .code-card.live .code-head::after { content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 30%; background: linear-gradient(90deg, transparent, var(--amber), transparent); animation: sweep 1.4s linear infinite; }
+        @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+        .actions { display: flex; gap: 6px; flex: none; }
+        .btn { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; color: var(--text); background: none; border: 1px solid var(--line); border-radius: 7px; padding: 4px 9px; cursor: pointer; }
+        .btn:hover:not(:disabled) { border-color: var(--amber); }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .btn.run { color: #1b1405; background: var(--amber); border-color: var(--amber); font-weight: 600; }
+        .btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn.run svg { fill: currentColor; stroke: none; }
+        .code-card pre { margin: 0; padding: 14px 16px; max-height: 480px; overflow: auto; background: transparent; }
+        .code-card pre code { font-family: var(--mono); font-size: 13px; line-height: 1.6; background: none; padding: 0; white-space: pre; }
         .hljs { background: transparent; padding: 0; }
+        .out { border-top: 1px solid var(--line); background: #0a101e; }
+        .out-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px 6px 14px; font-size: 12px; color: var(--muted); }
+        .out-body { max-height: 320px; overflow: auto; padding: 4px 16px 14px; font: 13px/1.6 var(--mono); white-space: pre-wrap; color: #cfd6e6; }
+        .out-body .err { color: var(--danger); }
+        .out-body iframe { display: block; width: 100%; height: 320px; border: 0; border-radius: 6px; background: #fff; }
 
-        .answer.streaming::after {
-            content: ""; display: inline-block; width: 9px; height: 9px;
-            border-radius: 50%; background: var(--amber);
-            animation: pulse 1s ease-in-out infinite;
-        }
-        .answer.error { color: var(--danger); font-family: var(--sans); font-size: 15px; }
-
-        .composer { border-top: 1px solid var(--line); padding: 14px 16px 12px; background: var(--ink); }
-        form { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; }
-        textarea {
-            flex: 1; min-width: 0; max-height: 180px; resize: none;
-            padding: 12px 14px; font: inherit; line-height: 1.5;
-            color: var(--text); background: var(--panel);
-            border: 1px solid var(--line); border-radius: 12px;
-        }
+        /* ---------- Composer ---------- */
+        .composer { border-top: 1px solid var(--line); padding: 14px 16px 12px; }
+        form { max-width: 780px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; }
+        textarea { flex: 1; min-width: 0; max-height: 180px; resize: none; padding: 12px 14px; font: inherit; line-height: 1.5; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
         textarea::placeholder { color: var(--muted); }
-        #sendButton {
-            font: inherit; font-weight: 600; padding: 12px 18px;
-            color: #1b1405; background: var(--amber);
-            border: 0; border-radius: 10px; cursor: pointer;
-        }
+        #sendButton { font: inherit; font-weight: 600; padding: 12px 18px; color: #1b1405; background: var(--amber); border: 0; border-radius: 10px; cursor: pointer; }
         #sendButton.stop { background: var(--panel); color: var(--text); border: 1px solid var(--line); }
-        #status { max-width: 760px; margin: 8px auto 0; font-size: 12px; color: var(--muted); }
+        #status { max-width: 780px; margin: 8px auto 0; font-size: 12px; color: var(--muted); }
 
         @media (max-width: 600px) {
             header { padding: 12px 14px; }
             .answer { font-size: 16px; }
             .user { max-width: 92%; }
+            .btn .label { display: none; }
         }
         @media (prefers-reduced-motion: reduce) {
-            .dot.busy, .answer.streaming::after { animation: none; }
+            .dot.busy, .answer.streaming::after, .code-card.live .status-dot, .code-card.live .code-head::after { animation: none; }
         }
     </style>
 </head>
@@ -163,11 +126,11 @@
         <div id="thread">
             <section class="empty" id="empty">
                 <h2>What are you building?</h2>
-                <p>Ask about Java, Spring Boot, or system design. Answers stream in as the model writes them.</p>
+                <p>Ask about Java, Spring Boot, or system design. Code arrives in its own card; JavaScript, Python and HTML can be run in the browser.</p>
                 <div class="chips">
                     <button class="chip" type="button">Explain how JWT authentication works in Spring Security</button>
-                    <button class="chip" type="button">Design a rate limiter for a REST API</button>
-                    <button class="chip" type="button">What is the difference between @Component, @Service and @Repository?</button>
+                    <button class="chip" type="button">Write a JavaScript debounce function and show it running</button>
+                    <button class="chip" type="button">Write a Python script that finds prime numbers up to 100</button>
                 </div>
             </section>
         </div>
@@ -195,16 +158,14 @@
 
     marked.setOptions({ gfm: true, breaks: true });
 
-    let controller = null;     // set while a response is streaming
-    let stickToBottom = true;  // stop auto-scroll when the user scrolls up
+    let controller = null;
+    let isStreaming = false;
+    let stickToBottom = true;
 
     scroller.addEventListener("scroll", () => {
         stickToBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 80;
     });
-
-    function scrollToBottom(force = false) {
-        if (force || stickToBottom) scroller.scrollTop = scroller.scrollHeight;
-    }
+    const scrollToBottom = (force = false) => { if (force || stickToBottom) scroller.scrollTop = scroller.scrollHeight; };
 
     function setBusy(busy) {
         dot.classList.toggle("busy", busy);
@@ -212,73 +173,253 @@
         sendButton.classList.toggle("stop", busy);
     }
 
-    function addTurn(question) {
-        document.getElementById("empty")?.remove();
+    /* =====================  Code card  ===================== */
 
-        const turn = document.createElement("div");
-        turn.className = "turn";
+    const ICON = {
+        play: '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>',
+        copy: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>',
+        check: '<svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>',
+        down: '<svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>'
+    };
+    const ALIAS = { js: "javascript", py: "python", sh: "bash", shell: "bash", yml: "yaml", ts: "typescript", html: "xml", "c#": "csharp" };
+    const EXT = { java: "java", javascript: "js", js: "js", typescript: "ts", python: "py", py: "py", html: "html", xml: "xml", json: "json", sql: "sql", bash: "sh", sh: "sh", yaml: "yml", yml: "yml", properties: "properties", css: "css", kotlin: "kt" };
+    const RUNNERS = { javascript: runJS, js: runJS, python: runPython, py: runPython, html: runHTML };
 
-        const user = document.createElement("div");
-        user.className = "user";
-        user.textContent = question;
+    const esc = s => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 
-        const answer = document.createElement("div");
-        answer.className = "answer streaming";
-        answer.textContent = "Thinking...";
-
-        turn.append(user, answer);
-        thread.appendChild(turn);
-        scrollToBottom(true);
-        return answer;
+    function highlight(code, lang) {
+        const l = ALIAS[lang] || lang;
+        if (l && window.hljs && hljs.getLanguage(l)) {
+            return hljs.highlight(code, { language: l, ignoreIllegals: true }).value;
+        }
+        return esc(code);
     }
 
-    function renderMarkdown(el, markdown) {
-        el.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
-        scrollToBottom();
+    function buildCard() {
+        const card = document.createElement("div");
+        card.className = "code-card";
+        card.innerHTML =
+            `<div class="code-head">
+       <span class="lang"><i class="status-dot"></i><span class="lang-name"></span></span>
+       <div class="actions">
+         <button type="button" class="btn run" hidden>${ICON.play}<span class="label">Run</span></button>
+         <button type="button" class="btn dl">${ICON.down}<span class="label">Download</span></button>
+         <button type="button" class="btn copy">${ICON.copy}<span class="label">Copy</span></button>
+       </div>
+     </div>
+     <pre><code class="hljs"></code></pre>
+     <div class="out" hidden>
+       <div class="out-head"><span class="out-status"></span><button type="button" class="btn close">Close</button></div>
+       <div class="out-body"></div>
+     </div>`;
+
+        const copy = card.querySelector(".copy");
+        copy.addEventListener("click", async () => {
+            const label = copy.querySelector(".label");
+            try {
+                await navigator.clipboard.writeText(card._code);
+                copy.firstElementChild.outerHTML = ICON.check; label.textContent = "Copied";
+            } catch { label.textContent = "Failed"; }
+            setTimeout(() => { copy.querySelector("svg").outerHTML = ICON.copy; copy.querySelector(".label").textContent = "Copy"; }, 1500);
+        });
+
+        card.querySelector(".dl").addEventListener("click", () => {
+            const cls = card._code.match(/(?:class|record|interface|enum)\s+(\w+)/);
+            const ext = EXT[card._lang] || "txt";
+            const name = (ext === "java" && cls ? cls[1] : "snippet") + "." + ext;
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(new Blob([card._code], { type: "text/plain" }));
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        });
+
+        card.querySelector(".run").addEventListener("click", () => runCard(card));
+        card.querySelector(".close").addEventListener("click", () => { card.querySelector(".out").hidden = true; card.querySelector(".out-body").replaceChildren(); });
+        return card;
     }
 
-    // Final pass: syntax highlighting + copy buttons (done once, after streaming).
-    function finalize(el, markdown) {
-        renderMarkdown(el, markdown);
-        el.classList.remove("streaming");
+    function updateCard(card, code, lang, live) {
+        lang = (lang || "").toLowerCase();
+        card._code = code;
+        card._lang = lang;
+        card.classList.toggle("live", live);
+        card.querySelector(".lang-name").textContent = live ? (lang || "code") + " (writing...)" : (lang || "text");
 
-        el.querySelectorAll("pre").forEach(pre => {
-            const code = pre.querySelector("code");
-            if (!code) return;
-            if (window.hljs) hljs.highlightElement(code);
+        const run = card.querySelector(".run");
+        run.hidden = !RUNNERS[lang];
+        run.disabled = live || isStreaming;
+        run.title = run.disabled ? "Available when the response finishes" : "Run in your browser";
 
-            const lang = (code.className.match(/language-([\w+-]+)/) || [])[1] || "text";
-            const wrap = document.createElement("div");
-            wrap.className = "code-block";
+        card.querySelector("code").innerHTML = highlight(code, lang);
+        if (live) { const pre = card.querySelector("pre"); pre.scrollTop = pre.scrollHeight; }
+    }
 
-            const bar = document.createElement("div");
-            bar.className = "code-bar";
-            const label = document.createElement("span");
-            label.textContent = lang;
-            const copy = document.createElement("button");
-            copy.type = "button";
-            copy.className = "copy";
-            copy.textContent = "Copy";
-            copy.addEventListener("click", async () => {
-                try {
-                    await navigator.clipboard.writeText(code.textContent);
-                    copy.textContent = "Copied";
-                } catch {
-                    copy.textContent = "Copy failed";
-                }
-                setTimeout(() => (copy.textContent = "Copy"), 1500);
-            });
+    /* =====================  Run code  ===================== */
 
-            bar.append(label, copy);
-            pre.replaceWith(wrap);
-            wrap.append(bar, pre);
+    function line(body, text, cls) {
+        const d = document.createElement("div");
+        if (cls) d.className = cls;
+        d.textContent = text;
+        body.appendChild(d);
+    }
+
+    async function runCard(card) {
+        const out = card.querySelector(".out");
+        const body = out.querySelector(".out-body");
+        const status = out.querySelector(".out-status");
+        out.hidden = false;
+        body.replaceChildren();
+        status.textContent = "Running...";
+        const t0 = performance.now();
+        try {
+            await RUNNERS[card._lang](card._code, body, status);
+            status.textContent = `Finished in ${Math.round(performance.now() - t0)} ms`;
+        } catch (e) {
+            line(body, e.message || String(e), "err");
+            status.textContent = "Failed";
+        }
+    }
+
+    // JavaScript runs in a sandboxed iframe (no access to this page, cookies or storage).
+    function runJS(code, body) {
+        return new Promise(resolve => {
+            const iframe = document.createElement("iframe");
+            iframe.sandbox = "allow-scripts";
+            iframe.style.display = "none";
+            let finished = false;
+
+            const finish = () => {
+                if (finished) return;
+                finished = true;
+                window.removeEventListener("message", onMsg);
+                iframe.remove();
+                resolve();
+            };
+            const onMsg = e => {
+                if (e.source !== iframe.contentWindow) return;
+                const { t, v } = e.data || {};
+                if (t === "log") line(body, v);
+                else if (t === "err") line(body, v, "err");
+                else if (t === "done") setTimeout(finish, 400);   // grace period for timers
+            };
+            window.addEventListener("message", onMsg);
+            setTimeout(() => { line(body, "Stopped: ran longer than 8 seconds.", "err"); finish(); }, 8000);
+
+            const safe = code.replace(/<\/script/gi, "<\\/script");
+            iframe.srcdoc = `<script>
+      const send = (t, v) => parent.postMessage({ t, v }, "*");
+      const fmt = a => a.map(x => typeof x === "string" ? x : (() => { try { return JSON.stringify(x, null, 2); } catch { return String(x); } })()).join(" ");
+      console.log = console.info = (...a) => send("log", fmt(a));
+      console.warn = console.error = (...a) => send("err", fmt(a));
+      addEventListener("error", e => send("err", e.message));
+      addEventListener("unhandledrejection", e => send("err", String(e.reason)));
+      (async () => { try { await (async () => {\n${safe}\n})(); } catch (e) { send("err", String(e)); } send("done"); })();
+    <\/script>`;
+            document.body.appendChild(iframe);
         });
     }
 
+    // HTML is previewed in a sandboxed iframe.
+    async function runHTML(code, body) {
+        const iframe = document.createElement("iframe");
+        iframe.sandbox = "allow-scripts";
+        iframe.srcdoc = code;
+        body.appendChild(iframe);
+    }
+
+    // Python runs through Pyodide (WebAssembly), downloaded on first use.
+    let pyodidePromise = null;
+    function loadPyodideOnce(status) {
+        if (pyodidePromise) return pyodidePromise;
+        status.textContent = "Loading Python runtime (first run only)...";
+        pyodidePromise = new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            s.onload = () => loadPyodide().then(resolve, reject);
+            s.onerror = () => reject(new Error("Could not download the Python runtime."));
+            document.head.appendChild(s);
+        });
+        pyodidePromise.catch(() => { pyodidePromise = null; });
+        return pyodidePromise;
+    }
+    async function runPython(code, body, status) {
+        const py = await loadPyodideOnce(status);
+        status.textContent = "Running...";
+        py.setStdout({ batched: s => line(body, s) });
+        py.setStderr({ batched: s => line(body, s, "err") });
+        await py.runPythonAsync(code);
+    }
+
+    /* =====================  Block-by-block rendering  ===================== */
+
+    const fenceOpen = raw => ((raw.match(/^\s*(?:`{3,}|~{3,})/gm) || []).length % 2) === 1;
+    const cleanCode = (text, open) => (open ? text.replace(/\n[`~]{1,2}$/, "") : text).replace(/\n$/, "");
+
     /*
-     * Smooth typing: the model sends tokens in uneven bursts. We queue them and
-     * reveal a few characters per animation frame, speeding up when the queue grows.
+     * Only the block that changed is re-rendered, so finished blocks (and any open
+     * code card) keep their DOM, scroll position and output while text streams in.
      */
+    function renderBlocks(el, text, streaming) {
+        const state = el._blocks || (el._blocks = []);
+        const tokens = marked.lexer(text).filter(t => t.type !== "space");
+
+        tokens.forEach((tok, i) => {
+            const open = streaming && i === tokens.length - 1 && fenceOpen(tok.raw);
+            const prev = state[i];
+            if (prev && prev.raw === tok.raw && prev.open === open) return;
+
+            if (tok.type === "code" && prev && prev.card) {
+                updateCard(prev.card, cleanCode(tok.text, open), tok.lang, open);
+                prev.raw = tok.raw; prev.open = open;
+                return;
+            }
+
+            const wrap = document.createElement("div");
+            wrap.className = "blk";
+            let card = null;
+
+            if (tok.type === "code") {
+                card = buildCard();
+                updateCard(card, cleanCode(tok.text, open), tok.lang, open);
+                wrap.appendChild(card);
+            } else {
+                wrap.innerHTML = DOMPurify.sanitize(marked.parser([tok]));
+                wrap.querySelectorAll("a").forEach(a => { a.target = "_blank"; a.rel = "noopener noreferrer"; });
+                const pres = [...wrap.querySelectorAll("pre")];       // code nested inside lists, quotes...
+                pres.forEach((pre, idx) => {
+                    const code = pre.querySelector("code");
+                    if (!code) return;
+                    const lang = (code.className.match(/language-([\w+#-]+)/) || [])[1] || "";
+                    const c = buildCard();
+                    updateCard(c, code.textContent.replace(/\n$/, ""), lang, open && idx === pres.length - 1);
+                    pre.replaceWith(c);
+                });
+            }
+
+            if (prev) prev.el.replaceWith(wrap); else el.appendChild(wrap);
+            state[i] = { raw: tok.raw, open, card, el: wrap };
+        });
+
+        while (state.length > tokens.length) state.pop().el.remove();
+        scrollToBottom();
+    }
+
+    function finalize(el, text) {
+        isStreaming = false;
+        renderBlocks(el, text, false);
+        el.classList.remove("streaming");
+        el.querySelectorAll(".code-card").forEach(card => {
+            card.classList.remove("live");
+            const run = card.querySelector(".run");
+            run.disabled = false;
+            run.title = "Run in your browser";
+        });
+    }
+
+    /* =====================  Streaming  ===================== */
+
+    // Tokens arrive in bursts; reveal a few characters per frame so text flows smoothly.
     function createTyper(el) {
         let shown = "", queue = "", raf = 0, ended = false, onEmpty = null;
 
@@ -287,48 +428,28 @@
             if (queue) {
                 let n = Math.max(2, Math.ceil(queue.length / 10));
                 const c = queue.charCodeAt(n - 1);
-                if (c >= 0xD800 && c <= 0xDBFF) n++;   // do not split a surrogate pair
+                if (c >= 0xD800 && c <= 0xDBFF) n++;
                 shown += queue.slice(0, n);
                 queue = queue.slice(n);
-                renderMarkdown(el, shown);
+                renderBlocks(el, shown, true);
             }
             if (queue) raf = requestAnimationFrame(tick);
             else if (ended && onEmpty) onEmpty();
         }
 
         return {
-            push(text) {
-                queue += text;
-                if (!raf) raf = requestAnimationFrame(tick);
-            },
-            drain() {                       // resolves once everything is on screen
-                ended = true;
-                return new Promise(resolve => {
-                    onEmpty = resolve;
-                    if (!queue) resolve();
-                });
-            },
-            flush() {                       // show everything immediately (used on Stop)
-                cancelAnimationFrame(raf);
-                raf = 0;
-                shown += queue;
-                queue = "";
-                return shown;
-            },
+            push(t) { queue += t; if (!raf) raf = requestAnimationFrame(tick); },
+            drain() { ended = true; return new Promise(r => { onEmpty = r; if (!queue) r(); }); },
+            flush() { cancelAnimationFrame(raf); raf = 0; shown += queue; queue = ""; return shown; },
             text() { return shown + queue; }
         };
     }
 
-    /*
-     * Do not trim a leading space from an SSE data value: a chunk can start with a
-     * meaningful model-generated space. Only the "data:" prefix is removed.
-     */
+    // Never trim a leading space: a chunk can start with a meaningful model-generated space.
     function parseSseEvent(eventText) {
-        const dataLines = [];
-        for (const line of eventText.split(/\r?\n/)) {
-            if (line.startsWith("data:")) dataLines.push(line.slice(5));
-        }
-        return dataLines.length ? dataLines.join("\n") : null;
+        const out = [];
+        for (const l of eventText.split(/\r?\n/)) if (l.startsWith("data:")) out.push(l.slice(5));
+        return out.length ? out.join("\n") : null;
     }
 
     async function streamAnswer(question, answerEl, signal) {
@@ -338,15 +459,13 @@
             body: JSON.stringify({ message: question }),
             signal
         });
-
         if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         if (!response.body) throw new Error("This browser does not support streamed responses.");
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         const typer = createTyper(answerEl);
-        let buffer = "";
-        let started = false;
+        let buffer = "", started = false;
 
         const handle = eventText => {
             const data = parseSseEvent(eventText);
@@ -359,15 +478,13 @@
             while (true) {
                 const { value, done } = await reader.read();
                 if (done) break;
-
                 buffer += decoder.decode(value, { stream: true });
-
                 let m;
                 const boundary = /\r?\n\r?\n/;
                 while ((m = boundary.exec(buffer)) !== null) {
-                    const eventText = buffer.slice(0, m.index);
+                    const ev = buffer.slice(0, m.index);
                     buffer = buffer.slice(m.index + m[0].length);
-                    if (eventText) handle(eventText);
+                    if (ev) handle(ev);
                 }
             }
             buffer += decoder.decode();
@@ -375,6 +492,7 @@
 
             await typer.drain();
             if (!typer.text().trim()) {
+                isStreaming = false;
                 answerEl.classList.remove("streaming");
                 answerEl.textContent = "The model returned an empty response.";
                 return;
@@ -382,7 +500,8 @@
             finalize(answerEl, typer.text());
         } catch (err) {
             if (err.name === "AbortError") {
-                finalize(answerEl, typer.flush() || "_Stopped before any text arrived._");
+                const text = typer.flush();
+                if (text) finalize(answerEl, text); else { isStreaming = false; answerEl.classList.remove("streaming"); answerEl.textContent = "Stopped before any text arrived."; }
                 err.stopped = true;
             }
             throw err;
@@ -391,10 +510,27 @@
         }
     }
 
+    /* =====================  Chat UI  ===================== */
+
+    function addTurn(question) {
+        document.getElementById("empty")?.remove();
+        const turn = document.createElement("div");
+        turn.className = "turn";
+        const user = document.createElement("div");
+        user.className = "user";
+        user.textContent = question;
+        const answer = document.createElement("div");
+        answer.className = "answer streaming";
+        answer.textContent = "Thinking...";
+        turn.append(user, answer);
+        thread.appendChild(turn);
+        scrollToBottom(true);
+        return answer;
+    }
+
     form.addEventListener("submit", async event => {
         event.preventDefault();
-
-        if (controller) { controller.abort(); return; }   // button acts as Stop
+        if (controller) { controller.abort(); return; }
 
         const question = promptInput.value.trim();
         if (!question) return;
@@ -404,6 +540,7 @@
         promptInput.style.height = "auto";
 
         controller = new AbortController();
+        isStreaming = true;
         setBusy(true);
         statusEl.textContent = "Generating response...";
 
@@ -411,15 +548,17 @@
             await streamAnswer(question, answerEl, controller.signal);
             statusEl.textContent = "Response complete";
         } catch (err) {
+            isStreaming = false;
             if (err.stopped) {
                 statusEl.textContent = "Stopped";
             } else {
                 console.error("Streaming error:", err);
                 answerEl.classList.remove("streaming");
-                answerEl.classList.add("error");
-                answerEl.textContent =
-                    "Could not get a response: " + err.message +
-                    ". Check that Spring Boot is running and Ollama has the model loaded.";
+                if (answerEl.textContent === "Thinking...") answerEl.textContent = "";
+                const msg = document.createElement("div");
+                msg.className = "fail";
+                msg.textContent = "Could not get a response: " + err.message + ". Check that Spring Boot is running and Ollama has the model loaded.";
+                answerEl.appendChild(msg);
                 statusEl.textContent = "Request failed";
             }
         } finally {
@@ -433,19 +572,14 @@
         promptInput.style.height = "auto";
         promptInput.style.height = Math.min(promptInput.scrollHeight, 180) + "px";
     });
-
     promptInput.addEventListener("keydown", event => {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
             if (!controller) form.requestSubmit();
         }
     });
-
     document.querySelectorAll(".chip").forEach(chip =>
-        chip.addEventListener("click", () => {
-            promptInput.value = chip.textContent;
-            form.requestSubmit();
-        })
+        chip.addEventListener("click", () => { promptInput.value = chip.textContent; form.requestSubmit(); })
     );
 </script>
 </body>
