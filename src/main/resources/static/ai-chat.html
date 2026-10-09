@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local AI Chat</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/github-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/lib/highlight.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .app {
+            max-width: 900px;
+            height: 100dvh;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #30363d;
+            border-right: 1px solid #30363d;
+        }
+
+        header {
+            padding: 18px 22px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+
+        header h2 { margin: 0; font-size: 19px; }
+        header p { margin: 6px 0 0; color: #8b949e; font-size: 13px; }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 18px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 780px;
+            margin: 0 auto 26px;
+        }
+
+        .avatar {
+            flex: 0 0 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #21262d;
+            font-size: 12px;
+        }
+
+        .content {
+            flex: 1;
+            min-width: 0;
+            line-height: 1.75;
+            overflow-wrap: anywhere;
+        }
+
+        .content p { margin: 0 0 14px; }
+        .content h1, .content h2, .content h3 {
+            line-height: 1.4;
+            margin: 22px 0 10px;
+        }
+
+        .content ul, .content ol { padding-left: 25px; }
+        .content li { margin: 5px 0; }
+
+        .content pre {
+            overflow-x: auto;
+            padding: 16px;
+            background: #010409;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            line-height: 1.55;
+        }
+
+        .content pre code {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 13px;
+            white-space: pre;
+        }
+
+        .content :not(pre) > code {
+            background: #21262d;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .content table {
+            display: block;
+            max-width: 100%;
+            overflow-x: auto;
+            border-collapse: collapse;
+        }
+
+        .content th, .content td {
+            padding: 8px 12px;
+            border: 1px solid #30363d;
+            text-align: left;
+        }
+
+        .content blockquote {
+            border-left: 3px solid #58a6ff;
+            margin-left: 0;
+            padding-left: 14px;
+            color: #b1bac4;
+        }
+
+        .composer {
+            padding: 16px;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+            max-width: 780px;
+            margin: auto;
+        }
+
+        textarea {
+            flex: 1;
+            min-width: 0;
+            max-height: 180px;
+            resize: none;
+            padding: 13px;
+            border: 1px solid #484f58;
+            border-radius: 12px;
+            background: #0d1117;
+            color: #e6edf3;
+            font: inherit;
+            line-height: 1.5;
+            outline: none;
+        }
+
+        textarea:focus { border-color: #58a6ff; }
+
+        button {
+            align-self: flex-end;
+            padding: 12px 17px;
+            border: 0;
+            border-radius: 10px;
+            background: #238636;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #status {
+            max-width: 780px;
+            margin: 8px auto 0;
+            color: #8b949e;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            #messages { padding: 18px 12px; }
+            .composer { padding: 12px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+    <header>
+        <h2>Local AI Chat</h2>
+        <p>Qwen2.5-Coder 7B · Spring AI · Ollama</p>
+    </header>
+
+    <main id="messages" aria-live="polite">
+        <div class="message">
+            <div class="avatar">AI</div>
+            <div class="content">
+                Hello! Ask me anything about Java, Spring Boot, or system design.
+            </div>
+        </div>
+    </main>
+
+    <div class="composer">
+        <form id="chatForm">
+            <textarea id="prompt" rows="1"
+                      placeholder="Message your AI..."
+                      aria-label="Message"
+                      required></textarea>
+            <button id="sendButton" type="submit">Send</button>
+        </form>
+        <div id="status">Ready</div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "/api/ai/chat";
+
+    const messages = document.getElementById("messages");
+    const form = document.getElementById("chatForm");
+    const promptInput = document.getElementById("prompt");
+    const sendButton = document.getElementById("sendButton");
+    const statusElement = document.getElementById("status");
+
+    marked.setOptions({ gfm: true, breaks: true });
+
+    function scrollToBottom() {
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addMessage(role, text = "") {
+        const row = document.createElement("div");
+        row.className = "message";
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.textContent = role === "user" ? "You" : "AI";
+
+        const content = document.createElement("div");
+        content.className = "content";
+
+        row.append(avatar, content);
+        messages.appendChild(row);
+
+        if (role === "user") {
+            content.textContent = text;
+        }
+
+        scrollToBottom();
+        return content;
+    }
+
+    function renderMarkdown(element, markdown, final = false) {
+        element.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+
+        if (final && window.hljs) {
+            element.querySelectorAll("pre code").forEach(code => {
+                hljs.highlightElement(code);
+            });
+        }
+
+        scrollToBottom();
+    }
+
+    /*
+     * IMPORTANT:
+     * Do not trim or remove a leading space from an SSE data value.
+     * A chunk can itself start with a meaningful model-generated space.
+     */
+    function parseSseEvent(eventText) {
+        const lines = eventText.split(/\r?\n/);
+        const dataLines = [];
+
+        for (const line of lines) {
+            if (line.startsWith("data:")) {
+                // Remove only "data:", preserving every character after it.
+                dataLines.push(line.slice(5));
+            }
+        }
+
+        return dataLines.length ? dataLines.join("\n") : null;
+    }
+
+    async function streamAnswer(question, answerElement) {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/event-stream"
+            },
+            body: JSON.stringify({ message: question })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+        }
+
+        if (!response.body) {
+            throw new Error("Streaming is not supported by this response.");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+
+        let buffer = "";
+        let answer = "";
+        let renderPending = false;
+
+        function renderSoon() {
+            if (renderPending) return;
+            renderPending = true;
+
+            requestAnimationFrame(() => {
+                renderPending = false;
+                renderMarkdown(answerElement, answer, false);
+            });
+        }
+
+        function processEvent(eventText) {
+            if (eventText === "") return;
+
+            const data = parseSseEvent(eventText);
+            if (data === null) return;
+
+            // No trim(), no join without separators, no token-level elements.
+            answer += data;
+            renderSoon();
+        }
+
+        try {
+            while (true) {
+                const { value, done } = await reader.read();
+
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+
+                let match;
+                const eventBoundary = /\r?\n\r?\n/;
+
+                while ((match = eventBoundary.exec(buffer)) !== null) {
+                    const eventText = buffer.slice(0, match.index);
+                    buffer = buffer.slice(match.index + match[0].length);
+                    processEvent(eventText);
+                }
+            }
+
+            buffer += decoder.decode();
+
+            if (buffer.length > 0) {
+                processEvent(buffer);
+            }
+
+            // Render the complete Markdown and highlight code blocks.
+            renderMarkdown(answerElement, answer, true);
+
+            if (!answer.trim()) {
+                answerElement.textContent = "The model returned an empty response.";
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const question = promptInput.value.trim();
+        if (!question || sendButton.disabled) return;
+
+        addMessage("user", question);
+        const answerElement = addMessage("assistant");
+        answerElement.textContent = "Thinking...";
+
+        promptInput.value = "";
+        promptInput.style.height = "auto";
+        sendButton.disabled = true;
+        statusElement.textContent = "Generating response...";
+
+        try {
+            await streamAnswer(question, answerElement);
+            statusElement.textContent = "Response completed";
+        } catch (error) {
+            console.error("AI streaming error:", error);
+            answerElement.textContent =
+                "Request failed: " + error.message +
+                ". Check that Spring Boot and Ollama are running.";
+            statusElement.textContent = "Request failed";
+        } finally {
+            sendButton.disabled = false;
+            promptInput.focus();
+        }
+    });
+
+    promptInput.addEventListener("input", () => {
+        promptInput.style.height = "auto";
+        promptInput.style.height =
+            Math.min(promptInput.scrollHeight, 180) + "px";
+    });
+
+    promptInput.addEventListener("keydown", event => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            form.requestSubmit();
+        }
+    });
+</script>
+</body>
+</html>
