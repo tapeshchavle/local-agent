@@ -1,5 +1,7 @@
 target/
 .idea/
+temp_auto_push.bat
 *.iml
 .DS_Store
-.vscode/
+.gitignore
+branch_structure.json
